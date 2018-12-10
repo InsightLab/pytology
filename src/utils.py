@@ -24,8 +24,17 @@ def readTriples(path="data/glosário/",preprocess=False):
 		triples = []
 		with open(path) as f:
 			for line in f:
-				line = line.replace(">  <", "> <")
-				triples = triples  + [line.split(" ")[0:-1]]
+				# line = line.replace(">  <", "> <")
+				# triples = triples  + [line.split(" ")[0:-1]]
+				line = line[:-3] if line.endswith("\n") else line[:-2]
+				values = line.split("> ")
+
+				src = values[0]+">"
+				uri = values[1][1:]
+				trg = "> ".join(values[2:])
+
+				triples += [[src,uri,trg]]
+
 		return  triples 
 
 	def preProcess(file):
@@ -372,12 +381,12 @@ def analyse_ontology_nodes(path,centrs,resultsPath="results"):
 					values[n] = []
 				values[n].append(c)
 
-	with open("{}/nodesDataFrame.csv".format(resultsPath),'w') as f:
-		f.write(",".join(index)+"\n")
+	with open("{}/nodesDataFrame.tsv".format(resultsPath),'w') as f:
+		f.write("\t".join(index)+"\n")
 		for n in values:
 			f.write("{}\t{}".format(n,"\t".join([str(val) for val in values[n]])+"\n"))
 
-	return pd.read_csv("{}/nodesDataFrame.csv".format(resultsPath),delimiter="\t")
+	return pd.read_csv("{}/nodesDataFrame.tsv".format(resultsPath),delimiter="\t")
 
 
 predicates_centralities = {
